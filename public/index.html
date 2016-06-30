@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>油猫饼的聊天室</title>
+    <link rel="stylesheet" href="css/style.css">
+    <script src="js/jquery-2.2.0.min.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
+    <script type="text/javascript">
+        $(function () {
+            var userData = {
+                message: $("#message").val()
+                , nickname: $("#nickname").val()
+                , userPic: ""
+                , gender: 'images/male.png'
+                , userQuantity: 0
+                , to: "all"
+                , busy: false
+                , time: ""
+            };
+            headChose();
+            genderSelect();
+            $(".gender input[name=sex]").change(function(){
+                genderSelect();
+            });
+            bgChange();
+            $(".btn").click(function () {
+                userData.nickname = $("#nickname").val();
+                userData.userPic = $("#uSnapshot img[alt=chosen]").attr("src");
+                userData.gender = $("#userInput input:checked").attr("alt");
+                var pattern = /^[\u4e00-\u9fa5]{1,6}$|^[\dA-Za-z_]{1,12}$/;
+                if (pattern.test(userData.nickname) == false) {
+                    alert("昵称必须短于6位中文或12位英文字符,且不含非法字符");
+                } else {
+                    $.getJSON({
+                        method: "POST"
+                        , url: "nameValid"
+                        , data: {validName: $("#nickname").val()}
+                        , success: function (flag) {
+                            if (flag == true) {
+                                alert("重名啦");
+                            } else {
+                                var clientSocket = io();
+                                $("#welcome").addClass("hide");
+                                $("#chatroom").removeClass("hide");
+                                meFlush(userData);
+                                clientSocket.emit("myEnter", userData);
+                                clientSocket.on("broadcastMsg", function (data) {
+                                    if (data.to == "all") {
+                                        $("#messages").append($("<li>").addClass("others")
+                                                .append($("<img>").addClass("uSnap").attr("src", "show?picPath=" + data.userPic))
+                                                .append($("<div>").append($("<div>").addClass("msgInfo").text(data.time)).append($("<img>").attr("src", "show?picPath=" + data.gender))
+                                                        .append($("<br>"))
+                                                        .append($("<div>").addClass("msg").text(data.nickname + ":" + data.message).css("text-align", "left")))
+                                        );
+                                        $("#messages").stop(true, true).animate({
+                                            scrollTop: $("#messages").prop('scrollHeight')
+                                        }, 1000, "swing");
+                                    } else if (data.to == userData.nickname) {
+                                        $("#messages").append($("<li>").addClass("others").addClass("secret")
+                                                .append($("<img>").addClass("uSnap").attr("src", "show?picPath=" + data.userPic))
+                                                .append($("<div>").append($("<div>").addClass("msgInfo").text(data.time)).append($("<img>").attr("src", "show?picPath=" + data.gender))
+                                                        .append($("<br>"))
+                                                        .append($("<div>").addClass("msg").text(data.nickname + "偷偷对你说:" + data.message).css("text-align", "left")))
+                                        );
+                                        $("#messages").stop(true, true).animate({
+                                            scrollTop: $("#messages").prop('scrollHeight')
+                                        }, 1000, "swing");
+                                    }
+                                    //scrollTop($("#messages").prop('scrollHeight'));
+                                });
+                                clientSocket.on("userEnter", function (data) {
+                                    $("#messages").append($("<li>").addClass("sysInfo")
+                                            .append($("<span>").text(data.nickname + "已加入聊天室，快去和他打招呼吧！")).css("text-align", "center"));
+                                    $(".currentOnline").text("当前在线人数：" + data.userQuantity);
+                                    $("#sidebar").append($("<li>").attr("alt", data.nickname)
+                                            .append($("<div>").html("<img class='genderPic' src="+data.gender+">"+data.nickname)
+                                                    .append($("<img>").attr("src", "show?picPath=" + data.userPic))));
+                                    buttonClick(userData);
+                                });
+                                clientSocket.on("welcome", function (data) {
+                                    $("#messages").append($("<li>").addClass("sysInfo")
+                                            .append($("<span>").text("您好，" + userData.nickname + "！欢迎进入火星聊天室，请在此畅所欲言")).css("text-align", "center"));
+                                    userFlush(data, userData);
+                                });
+                                clientSocket.on("yourMsg", function (data) {
+                                    if (data.to == "all") {
+                                        $("#messages").append($("<li>").addClass("my").css("text-align", "right")
+                                                .append($("<div>").append($("<div>").addClass("msgInfo").text(data.time)).append($("<img>").attr("src", "show?picPath=" + userData.gender))
+                                                        .append($("<br>"))
+                                                        .append($("<div>").addClass("msg").text(data.message)))
+                                                .append($("<img>").addClass("uSnap").attr("src", "show?picPath=" + userData.userPic))
+                                        );
+                                        /*$("#messages").append($("<li>").addClass("my")
+                                         .append($("<div>").text(data.message)).css("text-align", "right")
+                                         .append($("<img>").addClass("uSnap").attr("src", "show?picPath=" + userData.userPic))
+                                         );*/
+                                        $("#messages").stop(true, true).animate({
+                                            scrollTop: $("#messages").prop('scrollHeight')
+                                        }, 1000, "swing");
+                                    } else {
+                                        $("#messages").append($("<li>").addClass("my").addClass("secretTo").css("text-align", "right")
+                                                .append($("<div>").append($("<div>").addClass("msgInfo").text(data.time)).append($("<img>").attr("src", "show?picPath=" + userData.gender))
+                                                        .append($("<br>"))
+                                                        .append($("<div>").addClass("msg").text("你对" + data.to + "偷偷说：" + data.message)))
+                                                .append($("<img>").addClass("uSnap").attr("src", "show?picPath=" + userData.userPic))
+                                        );
+                                        $("#messages").stop(true, true).animate({
+                                            scrollTop: $("#messages").prop('scrollHeight')
+                                        }, 1000, "swing");
+                                    }
+                                });
+                                clientSocket.on("userBusy", function (data) {
+                                    if (data.busy) {
+                                        $("#sidebar li[alt=" + data.nickname + "]").addClass("busy");
+                                    } else {
+                                        $("#sidebar li[alt=" + data.nickname + "]").removeClass("busy");
+                                    }
+                                });
+                                clientSocket.on("userLeave", function (data) {
+                                    $("#messages").append($("<li>").addClass("sysInfo")
+                                            .append($("<span>").text(data.nickname + "离开了聊天室")).css("text-align", "center"));
+                                });
+                                clientSocket.on("userFlush", function (data) {
+                                    userFlush(data, userData);
+                                });
+                                $("#send").click(function () {
+                                    writeMsg(clientSocket, userData);
+                                });
+                                $("#message").keyup(function (e) {
+                                    if (e.keyCode == 13) {
+                                        writeMsg(clientSocket, userData);
+                                    }
+                                });
+                            }
+                            $(window).focusout(function () {
+                                userData.busy = true;
+                                clientSocket.emit("myBusy", userData);
+                            });
+                            $(window).focus(function () {
+                                userData.busy = false;
+                                clientSocket.emit("myBusy", userData);
+                            });
+                        }
+                    });
+                }
+            });
+        });
+
+        function writeMsg(clientSocket, userData) {
+            var msg = $("#message").val().replace(/['\t]/g, '').replace(/\s*/g, '');
+            if (msg != "") {
+                userData.time = new Date().toLocaleString();
+                userData.message = $("#message").val();
+                clientSocket.emit("myMsg", userData);
+                $("#message").val("");
+            } else {
+                $("#message").val("");
+            }
+        }
+        function meFlush(userData) {
+            $("#sidebar").append($("<div>").addClass("meInfo")
+                    .append($("<div>").html("<span>我：</span><img class='genderPic' src="+userData.gender+">" + userData.nickname)
+                            .append($("<img>").attr("src", "show?picPath=" + userData.userPic))))
+            ;
+        }
+        function userFlush(data, userData) {
+            $("#sidebar").empty();
+            meFlush(userData);
+            $("#sidebar").append($("<p>").addClass("currentOnline").text("当前在线人数：" + data.length));
+            for (i in data) {
+                if (data[i].nickname == userData.nickname) {
+                    continue;
+                } else {
+                    $("#sidebar").append($("<li>").attr("alt", data[i].nickname)
+                            .append($("<div>").html("<img class='genderPic' src="+data[i].gender+">"+data[i].nickname)
+                                    .append($("<img>").attr("src", "show?picPath=" + data[i].userPic))));
+                    buttonClick(userData);
+                }
+            }
+        }
+        function buttonClick(userData) {
+            $("#sidebar li").unbind("click");
+            $("#sidebar li").click(function () {
+                if ($(this).hasClass("activeUser")) {
+                    $(this).removeClass("activeUser");
+                    userData.to = "all";
+                } else {
+                    $(this).addClass("activeUser").siblings("li").removeClass("activeUser");
+                    userData.to = $(this).attr("alt");
+                }
+            });
+        }
+        function headChose() {
+            $("#headBox .head").each(function () {
+                $(this).click(function () {
+                    $(this).addClass("chosen").children("img").attr("alt", "chosen");
+                    $(this).siblings(".head").removeClass("chosen").children("img").attr("alt", "unchosen");
+                });
+            });
+        }
+        function bgChange() {
+            $(".changeBg").hover(function () {
+                $(this).stop().animate({"width": 100}, 500, "swing");
+            }, function () {
+                $(this).stop().animate({"width": 30}, 500, "swing");
+            }).click(function () {
+                var random = Math.floor(Math.random() * 7) + 1;
+                $("body").css({"background-image": "url(../images/" + random + ".png)"});
+            });
+        }
+
+        function genderSelect(){
+            $(".gender input[name=sex]").each(function(){
+                if($(this).is(":checked")){
+                    console.log($(this).next());
+                    $(this).next().css("border","5px solid tomato");
+                    $(this).parent().siblings("label").children("span").css("border","5px solid transparent");
+                }
+            });
+        }
+    </script>
+</head>
+<body>
+<header id="banner">
+    <h1>油猫饼的聊天室 <span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;点击右侧用户头像可以说悄悄话哦</span>&nbsp;&nbsp;&nbsp;</h1>
+</header>
+
+<section id="welcome">
+    <h2>油猫饼聊天室</h2>
+    <form id="uSnapshot">
+        <div id="headBox">
+            <div class="head"><img src="images/head1.jpg" alt="unchosen"/></div>
+            <div class="head"><img src="images/head2.jpg" alt="unchosen"/></div>
+            <div class="head"><img src="images/head3.jpg" alt="unchosen"/></div>
+            <br/>
+            <div class="head"><img src="images/head4.jpg" alt="unchosen"/></div>
+            <div class="head chosen"><img src="images/head5.jpg" alt="chosen"/></div>
+            <div class="head"><img src="images/head6.jpg" alt="unchosen"/></div>
+            <br/>
+            <div class="head"><img src="images/head7.jpg" alt="unchosen"/></div>
+            <div class="head"><img src="images/head8.jpg" alt="unchosen"/></div>
+            <div class="head"><img src="images/head9.jpg" alt="unchosen"/></div>
+        </div>
+        <div id="userInput">
+            <input id="nickname" type="text" placeholder="请输入您的昵称"/>
+            <br/>
+            <label class="gender"><input type="radio" name="sex" id="male" checked="checked" alt='images/male.png'><span
+                    class="male"></span></label>
+            <label class="gender"><input type="radio" name="sex" id="female" alt="images/female.png"><span class="female"></span></label>
+        </div>
+        <a id="startchat" class="btn">登录</a>
+    </form>
+</section>
+
+<div class="row">
+    <section id="chatroom" class="hide">
+        <div id="messages">
+        </div>
+        <div id="sidebar">
+        </div>
+        <input type="text" id="message" placeholder="在这里输入您的聊天内容">
+        <input type="button" id="send" value="点击或按下Enter可发送信息">
+    </section>
+</div>
+<div class="changeBg">
+    <p>点我可以变色</p>
+</div>
+
+</body>
+</html>

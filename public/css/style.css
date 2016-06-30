@@ -1,0 +1,559 @@
+html{height: 99%;}
+*{
+  margin: 0;
+  padding: 0;
+}
+body {
+  margin: 0;
+  padding: 0;
+  font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+  height: -moz-calc(100% - 20px);
+  height: -webkit-calc(100% - 20px);
+  height: calc(100% - 20px);
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box;
+  min-width: 768px;
+  transition:1s ease;
+  background-image:url("../images/2.png");
+}
+ul,li{
+  list-style: none;
+}
+a {
+  color: #00B7FF;
+}
+.hide{
+  display: none;
+}
+section#chatroom{
+  height: -moz-calc(100% - 10px);
+  height: -webkit-calc(100% - 10px);
+  height: calc(100% - 10px);
+  background-color: rgba(0,0,0,0.2);
+  width: 100%;
+  float: left;
+}
+#sidebar{
+  height: 100% ;
+  background-color: rgba(0,0,0,0.5);;
+  width:20%;
+  float: right;
+  padding: 10px;
+  box-sizing: border-box;
+  overflow: auto;
+  border-radius:5px;
+}
+#sidebar li{
+  margin-bottom: 5px;
+  position: relative;
+  background-color: darkseagreen;
+  border-radius: 4px;
+  transition:0.5s ease;
+  font-family: "黑体";
+}
+#sidebar div>div>img,#sidebar li>div>img{
+  height: 30px;
+  width: 30px;
+  vertical-align: middle;
+  float: left;
+  border-radius: 4px;
+  margin-right: 5px;
+}
+#sidebar li>div{
+  line-height: 30px;
+  font-size: 12px;
+  position: relative;
+  padding-left:5px
+}
+
+#sidebar li.activeUser{
+  background-color: #ccc;
+  transform:scale(1.02);
+}
+
+#sidebar .busy{
+  animation:busy-ing 2s infinite;
+}
+@keyframes busy-ing {
+  0%,100%{background-color: #ffe87c}
+  50%{
+    background-color: transparent;}
+}
+
+#sidebar .busy:after{
+  content:"忙碌中";
+  color: #000;
+  position: absolute;
+  right: 10px;
+  top: 7px;
+}
+section#welcome{
+  height: -moz-calc(100% - 180px);
+  height: -webkit-calc(100% - 180px);
+  height: calc(100% - 180px);
+  text-align: center;
+  padding-top: 20px;
+}
+section#welcome h2{
+  font-size: 82px;
+  color: #FFFFFF;
+  font-family: "黑体";
+}
+#snapShot img{
+  height: 200px;
+  width: 200px;
+}
+.uSnap{
+  height: 65px;
+  width: 65px;
+  vertical-align: top;
+  border-radius:50%;
+}
+#messages{
+  height: 100%;
+  width:80%;
+  padding: 10px;
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box;
+  background-color: rgba(0,0,0,0.2);;
+  overflow: auto;
+  float: left;
+  border-radius: 5px;
+  font-family: Arial,"幼圆";
+  font-size:18px;
+  border-radius:15px;
+}
+::-webkit-scrollbar-button{
+  background-color:red;
+}
+::-webkit-scrollbar-thumb:hover{
+  background-color:red;
+}
+::-webkit-scrollbar-track-piece{
+  background-color:#F3F3F3;  /*滑道*/
+  -webkit-border-radius:5px; /*滑道圆角宽度*/
+}
+::-webkit-scrollbar-thumb{
+  background-color:#F3F3F3; /*滑动条表面*/
+  border:solid 1px red; /*滑动条边框*/
+  border-radius:20px;  /*滑动条圆角宽度*/
+}
+
+/*
+::-webki-scrollbar-face: rgba(0,0,0,0.7);
+::-webki-scrollbar-3dlight: rgba(0,0,0,0.8);
+::-webki-scrollbar-highlight: rgba(0,0,0,0.5);
+::-webki-scrollbar-shadow: red;
+::-webki-scrollbar-darkshadow: blue;
+::-webki-scrollbar-track: yellow;
+::-webki-scrollbar-base: green;*/
+
+
+#uSnapshot{
+  width: 600px;
+  margin: 0 auto;
+  text-align: center;
+  position: relative;
+}
+
+#uSnapshot>div{
+  display: inline-block;
+}
+#messages li{
+  display: block;
+  transition:0.5s ease;
+  position: relative;
+  margin-bottom: 20px;
+}
+
+#messages .my>div{
+  display: inline-block;
+  text-align: right;
+  position: relative;
+  max-width:70%;
+}
+#messages li .msgInfo{
+  text-align: left;
+  display: inline-block;
+  margin: 0px 10px 2px 10px;
+  border-radius: 10px;
+  height: 10px;
+  background-color: rgba(0,0,0,0.5);
+  font-size: 8px;
+  padding: 5px 5px 8px 5px;
+  color: #fff;
+}
+
+#messages li .msg{
+  display: inline-block;
+  text-align: left;
+  margin: 0px 10px 0 10px;
+  border-radius:5px;
+  padding: 10px;
+}
+#messages .my:after{
+  content:"";
+  width: 0;
+  height: 0;
+  border-right: 10px solid transparent;
+  border-top: 10px solid sandybrown;
+  position: absolute;
+  right: 67px;
+  top: 31px;
+}
+#messages .secret>div .msg{
+  background-color: rgba(0,0,0,0.5);
+  color:#FFFFFF;
+}
+#chatroom #messages .secret:after{
+  content:"";
+  width: 0;
+  height: 0;
+  border-left: 10px solid transparent;
+  border-top: 10px solid rgba(0,0,0,0.5);
+  position: absolute;
+  left: 67px;
+  top: 31px;
+}
+#messages .secretTo>div .msg{
+  background-color: rgba(0,0,0,0.5);
+  color:#FFFFFF;
+}
+#chatroom #messages .secretTo:after{
+  content:"";
+  width: 0;
+  height: 0;
+  /*border-left: 10px solid transparent;*/
+  border-top: 10px solid rgba(0,0,0,0.5);
+  position: absolute;
+  right: 67px;
+  top: 31px;
+}
+
+#messages .others>div{
+  display: inline-block;
+  text-align: left;
+  position: relative;
+  max-width:70%;
+}
+#messages .others .msg{
+  background-color: darkseagreen;
+}
+.others div>img{
+  height: 18px;
+  position: absolute;
+  left: 148px;
+  top: 2px;
+}
+#messages .others:after{
+  content:"";
+  width: 0;
+  height: 0;
+  border-left: 10px solid transparent;
+  border-top: 10px solid darkseagreen;
+  position: absolute;
+  left: 67px;
+  top: 31px;
+}
+#messages .msgInfo{
+  height: 15px;
+  font-size: 8px;
+}
+
+.my div>img{
+  height: 18px;
+  position: absolute;
+  right: 146px;
+  top: 2px;
+}
+#messages .my .msg{
+  background-color: sandybrown;
+}
+
+.sysInfo{
+  font-size: 12px;
+  color:#FFF;
+  margin-bottom: 15px;
+}
+.sysInfo span{
+  padding: 4px;
+  border-radius: 5px;
+  border:1px solid rgba(0,0,0,0.2);
+  background-color : rgba(0,0,0,0.2);
+}
+.meInfo{
+  height: 35px;
+border-bottom: 5px solid rgba(98, 196, 98, 0.52);
+}
+.meInfo>div{
+  color:#FFF;
+  font-weight: bold;
+}
+.meInfo>div>span{
+  line-height: 33px;
+  color:darkseagreen;
+  font-weight: bold;
+}
+#sidebar .genderPic{
+  height: 20px;
+  width: 20px;
+  position: relative;
+  top: 5px;
+}
+.meInfo div:after{
+  content:"";
+  clear: both;
+}
+input#message{
+  width: -moz-calc(100% - 270px);
+  width: -webkit-calc(100% - 270px);
+  width: calc(100% - 270px);
+  height:35px;
+  margin-top: 7px;
+  border-radius:4px;
+  font-size:16px;
+  transition:0.5s ease;
+}
+input#send{
+  background-color: #5BB75B;
+  background-image: linear-gradient(to bottom,#62C462,#51A351);
+  background-repeat: repeat-x;
+  border-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1) rgba(0, 0, 0,0.25);
+  color: #FFFFFF;
+  text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25);
+  border-image: none;
+  border-radius: 4px 4px 4px 4px;
+  border-style: solid;
+  border-width: 1px;
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.2) inset,0 1px 2px rgba(0, 0, 0, 0.05);
+  cursor: pointer;
+  display: inline-block;
+  font-size: 14px;
+  line-height: 30px;
+  margin-bottom: 0;
+  padding: 4px 37px;
+  text-align: center;
+  vertical-align: middle;
+  text-decoration: none;
+}
+.currentOnline{
+  padding: 10px;
+  color: #FFFFFF;
+  font-family: "黑体";
+}
+header{
+  background-color: rgba(0,0,0,0.2);
+  text-align: right;
+  margin-top: 15px;
+}
+header h1{
+  padding: 5px;
+  padding-right: 15px;
+  color: #FFFFFF;
+  margin: 0;
+  font-family: "黑体";
+}
+header h1 span{
+  font-size:16px;
+}
+.row{
+  width: 100%;
+  height: -moz-calc(100% - 80px);
+  height: -webkit-calc(100% - 80px);
+  height: calc(100% - 80px);
+}
+
+#chatroom:after{
+  content: "";
+  clear: both;
+}
+footer{
+  padding: 6px;
+  background-color: #4192C1;
+  color: #FFFFFF;
+  width:100%;
+  margin: 0;
+  margin-bottom: 10px;
+  -moz-box-sizing:border-box;
+  -webkit-box-sizing:border-box;
+  box-sizing:border-box;
+}
+#uSnapshot span{
+  display: inline-block;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-image: url(../images/gender.jpg);
+  background-size: 255px;
+}
+#uSnapshot .female{
+  background-position: 177px -91px;
+}
+#uSnapshot .male{
+  background-position: 236px -91px;
+}
+#headBox{
+  display: block;
+}
+#headBox .head{
+  display: inline-block;
+  width: 100px;
+  height: 100px;
+  overflow: hidden;
+  position: relative;
+  margin: 5px;
+  transition: 0.3s ease;
+}
+#headBox .head:hover{
+  transform: scale(1.1);
+}
+#headBox .chosen>img{
+  border:5px solid tomato;
+}
+#headBox .head>img{
+  width: 90%;
+  position: absolute;
+  top:50%;
+  left:50%;
+  transform:translate(-50%,-50%);
+  border-radius: 50%;
+}
+#nickname{
+  margin-bottom: 10px;
+  font-size: 20px;
+}
+/*昵称*/
+.modal{
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box;
+  height:-moz-calc(100% - 102px);
+  height:-webkit-calc(100% - 102px);
+  height:calc(100% - 102px);
+  position:absolute;
+  left:0;
+  top:62px;
+  width:100%;
+  z-index:1000;
+}
+.backdrop{
+  width:100%;
+  height:100%;
+  background-color: #777777;
+}
+.popup{
+  position: absolute;
+  height:100px;
+  width:250px;
+  left:-moz-calc(50% - 150px);
+  left:-webkit-calc(50% - 150px);
+  left:calc(50% - 150px);
+  top:-moz-calc(50% - 50px);
+  top:-webkit-calc(50% - 50px);
+  top:calc(50% - 50px);
+  background-color: #FFFFFF;
+}
+.pophead{
+  background-color: #4192C1;
+  color:#FFFFFF;
+  font-weight: bold;
+  padding:8px 3px;
+  vertical-align: middle;
+}
+.popbody{
+  padding:10px 5px;
+}
+.changeBg{
+  position: fixed;
+  right: 0;
+  top: 2px;
+  background-color: rgba(0,0,0,0.6);
+  color:white;
+  font-size:15px;
+  font-family:"黑体";
+  height: 50px;
+  width: 30px;
+  overflow: hidden;
+  padding: 10px;
+  cursor:pointer;
+}
+#message:focus{
+  box-shadow: gold 0px 0px 10px;
+}
+/*欢迎页面*/
+.btn{
+  background-color: #5BB75B;
+  background-image: linear-gradient(to bottom,#62C462,#51A351);
+  background-repeat: repeat-x;
+  border-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1) rgba(0, 0, 0,0.25);
+  color: #FFFFFF;
+  text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25);
+  border-image: none;
+  border-radius: 4px 4px 4px 4px;
+  border-style: solid;
+  border-width: 1px;
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.2) inset,0 1px 2px rgba(0, 0, 0, 0.05);
+  cursor: pointer;
+  display: inline-block;
+  font-size: 14px;
+  line-height: 75px;
+  margin-bottom: 0;
+  padding: 4px 24px;
+  text-align: center;
+  vertical-align: middle;
+  text-decoration: none;
+  position: absolute;
+  right: 125px;
+  bottom: -105px;
+}
+#userInput>div{
+  display: inline-block;
+}
+.gender{
+  margin-right: 20px;
+}
+#userInput{
+  position: absolute;
+  left: 145px;
+  bottom: -110px;
+}
+
+.gender input[name=sex]{
+  visibility:hidden;
+}
+
+
+/*******************************************************************************************/
+#chatrooms{
+  margin: 20px;
+}
+#new_room {
+  font-size: 17px;
+}
+#new_room span{
+  padding-right: 15px;
+}
+#allrooms #header{
+  border-bottom: 1px solid;
+  border-top: 1px solid;
+  font-size: 17px;
+  margin-bottom: 10px;
+  margin-top: 16px;
+  padding: 5px 0;
+}
+.room_div {
+  border-bottom: 1px solid #CCCCCC;
+  padding-bottom: 5px;
+  padding-top: 12px;
+}
+.room_name {
+  display: inline-block;
+  font-weight: bold;
+  width: 165px;
+}
+.room_div a{
+  position: absolute;
+  right: 40px;
+}
